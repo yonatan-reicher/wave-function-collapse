@@ -1,0 +1,2 @@
+Source File,Dest File,Processor Type,Content Type,Source File Size,Dest File Size,Build Seconds
+"C:/projects/monogame-test/Content/tilemap_packed.png","C:/projects/monogame-test/Content/bin/DesktopGL/Content/tilemap.xnb","TextureProcessor","Texture2DContent",5049,135253,0.262638

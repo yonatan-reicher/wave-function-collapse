@@ -1,0 +1,191 @@
+using System;
+using Microsoft.Xna.Framework;
+
+public enum Dir {
+    Up,
+    Down,
+    Left,
+    Right,
+}
+
+public static class DirExtension {
+    public static Dir Opposite(this Dir dir) {
+        return dir switch {
+            Dir.Right => Dir.Left,
+            Dir.Left => Dir.Right,
+            Dir.Up => Dir.Down,
+            Dir.Down => Dir.Up,
+            _ => throw new Exception("Invalid dir value"),
+        };
+    }
+}
+
+public enum Tile {
+    Grass,
+    Flower,
+    Sand,
+    GrassSandUL,
+    GrassSandU,
+    GrassSandUR,
+    GrassSandL,
+    GrassSandR,
+    GrassSandDL,
+    GrassSandD,
+    GrassSandDR,
+    GrassSandCornerUL,
+    GrassSandCornerUR,
+    GrassSandCornerDL,
+    GrassSandCornerDR,
+    RoofUL,
+    RoofU,
+    RoofUR,
+    RoofDL,
+    RoofD,
+    RoofDR,
+    RoofOverhang,
+    RoofChimney,
+    HouseLeft,
+    House,
+    Door,
+    HouseRight,
+}
+
+public enum TileEdge {
+    Grass,
+    Sand,
+    GrassSandUD,
+    GrassSandDU,
+    GrassSandLR,
+    GrassSandRL,
+    Roof,
+    RoofUD,
+    RoofDU,
+    RoofLR,
+    RoofRL,
+    House,
+    HouseLR,
+    HouseRL,
+}
+
+public static class Tiles {
+    public const int TILE_SIZE = 16;
+
+    public static TileEdge GetEdge(this Tile tile, Dir dir) {
+        return (tile, dir) switch {
+            (Tile.Grass, _) => TileEdge.Grass,
+            (Tile.Flower, _) => TileEdge.Grass,
+            (Tile.Sand, _) => TileEdge.Sand,
+            (Tile.GrassSandU, Dir.Up) => TileEdge.Grass,
+            (Tile.GrassSandU, Dir.Down) => TileEdge.Sand,
+            (Tile.GrassSandU, _) => TileEdge.GrassSandUD,
+            (Tile.GrassSandD, Dir.Down) => TileEdge.Grass,
+            (Tile.GrassSandD, Dir.Up) => TileEdge.Sand,
+            (Tile.GrassSandD, _) => TileEdge.GrassSandDU,
+            (Tile.GrassSandL, Dir.Left) => TileEdge.Grass,
+            (Tile.GrassSandL, Dir.Right) => TileEdge.Sand,
+            (Tile.GrassSandL, _) => TileEdge.GrassSandLR,
+            (Tile.GrassSandR, Dir.Right) => TileEdge.Grass,
+            (Tile.GrassSandR, Dir.Left) => TileEdge.Sand,
+            (Tile.GrassSandR, _) => TileEdge.GrassSandRL,
+            (Tile.GrassSandUL, Dir.Up or Dir.Left) => TileEdge.Grass,
+            (Tile.GrassSandUL, Dir.Down) => TileEdge.GrassSandLR,
+            (Tile.GrassSandUL, Dir.Right) => TileEdge.GrassSandUD,
+            (Tile.GrassSandUR, Dir.Up or Dir.Right) => TileEdge.Grass,
+            (Tile.GrassSandUR, Dir.Down) => TileEdge.GrassSandRL,
+            (Tile.GrassSandUR, Dir.Left) => TileEdge.GrassSandUD,
+            (Tile.GrassSandDL, Dir.Down or Dir.Left) => TileEdge.Grass,
+            (Tile.GrassSandDL, Dir.Up) => TileEdge.GrassSandLR,
+            (Tile.GrassSandDL, Dir.Right) => TileEdge.GrassSandDU,
+            (Tile.GrassSandDR, Dir.Down or Dir.Right) => TileEdge.Grass,
+            (Tile.GrassSandDR, Dir.Up) => TileEdge.GrassSandRL,
+            (Tile.GrassSandDR, Dir.Left) => TileEdge.GrassSandDU,
+            (Tile.GrassSandCornerUL, Dir.Up) => TileEdge.GrassSandLR,
+            (Tile.GrassSandCornerUL, Dir.Left) => TileEdge.GrassSandUD,
+            (Tile.GrassSandCornerUL, _) => TileEdge.Sand,
+            (Tile.GrassSandCornerUR, Dir.Up) => TileEdge.GrassSandRL,
+            (Tile.GrassSandCornerUR, Dir.Right) => TileEdge.GrassSandUD,
+            (Tile.GrassSandCornerUR, _) => TileEdge.Sand,
+            (Tile.GrassSandCornerDL, Dir.Down) => TileEdge.GrassSandLR,
+            (Tile.GrassSandCornerDL, Dir.Left) => TileEdge.GrassSandDU,
+            (Tile.GrassSandCornerDL, _) => TileEdge.Sand,
+            (Tile.GrassSandCornerDR, Dir.Down) => TileEdge.GrassSandRL,
+            (Tile.GrassSandCornerDR, Dir.Right) => TileEdge.GrassSandDU,
+            (Tile.GrassSandCornerDR, _) => TileEdge.Sand,
+            (Tile.RoofUL, Dir.Up or Dir.Left) => TileEdge.Grass,
+            (Tile.RoofUL, Dir.Down) => TileEdge.RoofLR,
+            (Tile.RoofUL, Dir.Right) => TileEdge.RoofUD,
+            (Tile.RoofUR, Dir.Up or Dir.Right) => TileEdge.Grass,
+            (Tile.RoofUR, Dir.Down) => TileEdge.RoofRL,
+            (Tile.RoofUR, Dir.Left) => TileEdge.RoofUD,
+            (Tile.RoofDL, Dir.Left) => TileEdge.Grass,
+            (Tile.RoofDL, Dir.Down) => TileEdge.HouseLR,
+            (Tile.RoofDL, Dir.Up) => TileEdge.RoofLR,
+            (Tile.RoofDL, Dir.Right) => TileEdge.RoofDU,
+            (Tile.RoofDR, Dir.Right) => TileEdge.Grass,
+            (Tile.RoofDR, Dir.Down) => TileEdge.HouseRL,
+            (Tile.RoofDR, Dir.Up) => TileEdge.RoofRL,
+            (Tile.RoofDR, Dir.Left) => TileEdge.RoofDU,
+            (Tile.RoofU, Dir.Up) => TileEdge.Grass,
+            (Tile.RoofU, Dir.Left or Dir.Right) => TileEdge.RoofUD,
+            (Tile.RoofU, Dir.Down) => TileEdge.Roof,
+            (Tile.RoofD, Dir.Down) => TileEdge.House,
+            (Tile.RoofD, Dir.Left or Dir.Right) => TileEdge.RoofDU,
+            (Tile.RoofD, Dir.Up) => TileEdge.Roof,
+            (Tile.RoofOverhang, Dir.Down) => TileEdge.House,
+            (Tile.RoofOverhang, Dir.Left or Dir.Right) => TileEdge.RoofDU,
+            (Tile.RoofOverhang, Dir.Up) => TileEdge.Roof,
+            (Tile.RoofChimney, Dir.Up) => TileEdge.Grass,
+            (Tile.RoofChimney, Dir.Left or Dir.Right) => TileEdge.RoofUD,
+            (Tile.RoofChimney, Dir.Down) => TileEdge.Roof,
+            (Tile.HouseLeft, Dir.Left or Dir.Down) => TileEdge.Grass,
+            (Tile.HouseLeft, Dir.Right) => TileEdge.House,
+            (Tile.HouseLeft, Dir.Up) => TileEdge.HouseLR,
+            (Tile.HouseRight, Dir.Right or Dir.Down) => TileEdge.Grass,
+            (Tile.HouseRight, Dir.Left) => TileEdge.House,
+            (Tile.HouseRight, Dir.Up) => TileEdge.HouseRL,
+            (Tile.House, Dir.Down) => TileEdge.Grass,
+            (Tile.House, _) => TileEdge.House,
+            (Tile.Door, Dir.Down) => TileEdge.Grass,
+            (Tile.Door, _) => TileEdge.House,
+            _ => throw new Exception("Invalid tile"),
+        };
+    }
+
+    static (int x, int y) GetTilemapPos(Tile tile) {
+        return tile switch {
+            Tile.Grass => (0, 0),
+            Tile.Flower => (2, 0),
+            Tile.Sand => (1, 2),
+            Tile.GrassSandUL => (0, 1),
+            Tile.GrassSandU => (1, 1),
+            Tile.GrassSandUR => (2, 1),
+            Tile.GrassSandL => (0, 2),
+            Tile.GrassSandR => (2, 2),
+            Tile.GrassSandDL => (0, 3),
+            Tile.GrassSandD => (1, 3),
+            Tile.GrassSandDR => (2, 3),
+            Tile.GrassSandCornerUL => (3, 3),
+            Tile.GrassSandCornerUR => (4, 3),
+            Tile.GrassSandCornerDR => (5, 3),
+            Tile.GrassSandCornerDL => (6, 3),
+            Tile.RoofUL => (0, 4),
+            Tile.RoofU => (1, 4),
+            Tile.RoofUR => (2, 4),
+            Tile.RoofDL => (0, 5),
+            Tile.RoofD => (1, 5),
+            Tile.RoofDR => (2, 5),
+            Tile.RoofChimney => (3, 4),
+            Tile.RoofOverhang => (3, 5),
+            Tile.HouseLeft => (0, 6),
+            Tile.House => (1, 6),
+            Tile.Door => (1, 7),
+            Tile.HouseRight => (3, 6),
+            _ => throw new Exception("Invalid tile"),
+        };
+    }
+
+    public static Rectangle GetTilemapSource(Tile tile) {
+        var (x, y) = GetTilemapPos(tile);
+        return new Rectangle(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+    }
+}
